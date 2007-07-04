@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
 
-<plugin id="org.coode.bookmark" version="1.1.1.Bookmark">
+<plugin id="org.coode.bookmark" version="1.1.2.Bookmark">    
 
     <attributes>
-        <attribute id="update-url" value="http://www.co-ode.org/downloads/protege-x/bookmark-plugin.xml"/>
+        <attribute id="update-url" value="http://www.co-ode.org/downloads/protege-x/update/bookmark-plugin.xml"/>
     </attributes>
 
     <requires>
@@ -13,7 +13,7 @@
     </requires>
 
     <runtime>
-        <library id="org.coode.bookmark" path="./" type="code">
+        <library id="org.coode.bookmark" path="classes/" type="code">
         </library>
     </runtime>
 
