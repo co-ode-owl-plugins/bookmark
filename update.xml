@@ -1,0 +1,5 @@
+<plugin version="1.1.2.Bookmark">
+	<download url="http://co-ode-owl-plugins.googlecode.com/files/org.coode.bookmark.zip"/>
+ 	<website url="http://www.co-ode.org/downloads/protege-x/plugins.php"/>
+	<readme url="http://www.co-ode.org/downloads/protege-x/readme.txt"/>
+</plugin>
