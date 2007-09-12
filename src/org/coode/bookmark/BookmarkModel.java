@@ -9,8 +9,8 @@ import org.protege.editor.owl.ui.OWLEntityComparator;
 import org.semanticweb.owl.model.*;
 
 import javax.swing.*;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.util.*;
 
 /*
@@ -165,5 +165,11 @@ public class BookmarkModel implements ListModel {
         ontologybookmarks.remove(ont);
         ontologybookmarks.put(ont, new OntologyBookmarks(mngr.getOWLOntologyManager(), ont));
         fireDataChanged();
+    }
+
+    public void dispose(){
+        listeners.clear();
+        mngr.removeListener(modelListener);
+        mngr.removeOntologyChangeListener(ontListener);
     }
 }

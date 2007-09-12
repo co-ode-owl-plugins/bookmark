@@ -4,9 +4,9 @@ import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLException;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLEntity;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -94,6 +94,7 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
 
     public void disposeView() {
         list.getSelectionModel().removeListSelectionListener(listSelectionListener);
+        list.getBookmarkModel().dispose();
     }
 
     protected OWLObject updateView() {
