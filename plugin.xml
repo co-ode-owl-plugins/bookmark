@@ -1,37 +1,22 @@
 <?xml version="1.0" ?>
-<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
 
-<plugin id="org.coode.bookmark" version="1.1.2.Bookmark">    
+<plugin>
 
-    <attributes>
-        <attribute id="update-url" value="http://co-ode-owl-plugins.googlecode.com/svn/trunk/bookmark/update.xml"/>
-    </attributes>
-
-    <requires>
-        <import plugin-id="org.protege.editor.core.application"/>
-        <import plugin-id="org.protege.editor.owl"/>
-    </requires>
-
-    <runtime>
-        <library id="org.coode.bookmark" path="classes/" type="code">
-        </library>
-    </runtime>
-
-    <!-- Declare extension points for the app -->
-
-    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.bookmark.view">
-        <parameter id="label" value="Bookmarks"/>
-        <parameter id="class" value="org.coode.bookmark.BookmarkView"/>
-        <parameter id="headerColor" value="@org.protege.ontologycolor"/>
+    <extension id="BookmarkView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Bookmarks"/>
+        <class value="org.coode.bookmark.BookmarkView"/>
+        <headerColor value="@org.protege.ontologycolor"/>
     </extension>
 
-    <extension plugin-id="org.protege.editor.core.application" point-id="EditorKitMenuAction" id="org.coode.bookmark.action">
-        <parameter id="name" value="Bookmarks..."/>
-        <parameter id="class" value="org.coode.bookmark.BookmarkAction"/>
-        <parameter id="toolTip" value="List bookmarks for this ontology"/>
-        <parameter id="path" value="org.protege.editor.owl.menu.tools/SlotG-A"/>
-        <parameter id="editorKitId" value="OWLEditorKit"/>
-        <parameter id="accelerator" value="B"/>
+    <extension id="BookmarkAction"
+               point="org.protege.editor.core.application.EditorKitMenuAction">
+        <name value="Bookmarks..."/>
+        <class value="org.coode.bookmark.BookmarkAction"/>
+        <toolTip value="List bookmarks for this ontology"/>
+        <path value="org.protege.editor.owl.menu.tools/SlotG-A"/>
+        <editorKitId value="OWLEditorKit"/>
+        <accelerator value="B"/>
     </extension>
 
 </plugin>

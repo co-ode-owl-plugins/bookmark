@@ -1,7 +1,7 @@
 package org.coode.bookmark;
 
-import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.protege.editor.owl.model.OWLWorkspace;
+import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 
 import java.awt.event.ActionEvent;
 
@@ -40,7 +40,7 @@ import java.awt.event.ActionEvent;
  */
 public class BookmarkAction extends ProtegeOWLAction {
     public void actionPerformed(ActionEvent actionEvent) {
-        getOWLEditorKit().getOWLWorkspace().showResultsView("org.coode.bookmark.view", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
+        getOWLEditorKit().getOWLWorkspace().showResultsView("org.coode.bookmark.BookmarkView", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
     }
 
     public void initialise() throws Exception {
