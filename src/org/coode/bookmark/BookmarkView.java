@@ -69,14 +69,14 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
     };
 
     private ListSelectionListener listSelectionListener = new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                final Object val = list.getSelectedValue();
-                deleteAction.setEnabled(val != null);
-                if (val != null){
-                    getOWLEditorKit().getOWLWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)val);
-                }
+        public void valueChanged(ListSelectionEvent e) {
+            final Object val = list.getSelectedValue();
+            deleteAction.setEnabled(val != null);
+            if (val != null){
+                getOWLEditorKit().getOWLWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)val);
             }
-        };
+        }
+    };
 
     public void initialiseView() throws Exception {
         setLayout(new BorderLayout());
@@ -98,6 +98,35 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
     }
 
     protected OWLObject updateView() {
+        OWLEntity selectedEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
+        if (list.getSelectedObjects().contains(selectedEntity)){
+            return selectedEntity;
+        }
+        else if (list.getBookmarkModel().contains(selectedEntity)){
+            list.setSelectedValue(selectedEntity, true);
+            return selectedEntity;
+        }
+        list.clearSelection();
         return null;
+    }
+
+
+    protected boolean isOWLClassView() {
+        return true;
+    }
+
+
+    protected boolean isOWLObjectPropertyView() {
+        return true;
+    }
+
+
+    protected boolean isOWLDataPropertyView() {
+        return true;
+    }
+
+
+    protected boolean isOWLIndividualView() {
+        return true;
     }
 }

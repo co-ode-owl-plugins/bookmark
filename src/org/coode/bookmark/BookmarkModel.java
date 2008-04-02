@@ -172,4 +172,14 @@ public class BookmarkModel implements ListModel {
         mngr.removeListener(modelListener);
         mngr.removeOntologyChangeListener(ontListener);
     }
+
+
+    public boolean contains(OWLEntity entity) {
+        for (OntologyBookmarks bm : ontologybookmarks.values()){
+            if (bm.getBookmarks().contains(entity)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
