@@ -77,44 +77,61 @@ public class OntologyBookmarks {
     }
 
     public List<OWLOntologyChange> add(OWLEntity obj) throws OWLException {
-        bookmarks.add(obj);
-        return getUpdateChanges();
+        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+        if (bookmarks.add(obj)){
+            OWLConstant value = mngr.getOWLDataFactory().getOWLUntypedConstant(obj.getURI().toString());
+            OWLAnnotation annot = mngr.getOWLDataFactory().getOWLConstantAnnotation(annotURI, value);
+            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLOntologyAnnotationAxiom(ont, annot)));
+        }
+        changes.addAll(tidyOldStyleAnnotations());
+        return changes;
     }
 
     public List<OWLOntologyChange> remove(OWLEntity obj) throws OWLException {
-        bookmarks.remove(obj);
-        return getUpdateChanges();
+        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+        if (bookmarks.remove(obj)){
+            for (OWLOntologyAnnotationAxiom axiom : ont.getAnnotations(ont)){
+                final OWLAnnotation annotation = axiom.getAnnotation();
+                if (annotation.getAnnotationURI().equals(annotURI)){
+                    if (annotation.getAnnotationValueAsConstant().getLiteral().equals(obj.getURI().toString())){
+                        changes.add(new RemoveAxiom(ont, axiom));
+                    }
+                }
+            }
+        }
+        changes.addAll(tidyOldStyleAnnotations());
+        return changes;
     }
 
-    public List<OWLOntologyChange> clear() throws OWLException {
+
+    /**
+     * Get rid of any annotations that contain more than one bookmark. Replace them with individual ones
+     * @return a list of changes required to split these annotations down into separate ones
+     */
+    private List<OWLOntologyChange> tidyOldStyleAnnotations() {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         for (OWLOntologyAnnotationAxiom axiom : ont.getAnnotations(ont)){
             final OWLAnnotation annotation = axiom.getAnnotation();
             if (annotation.getAnnotationURI().equals(annotURI)){
-                changes.add(new RemoveAxiom(ont, axiom));
+                final String value = annotation.getAnnotationValueAsConstant().getLiteral();
+                String[] values = value.split("\n");
+                if (values.length > 1){
+                    changes.add(new RemoveAxiom(ont, axiom));
+                    for (String v : values){
+                        for (OWLEntity bookmark : bookmarks){
+                            if (bookmark.getURI().toString().equals(v)){
+                                OWLConstant constant = mngr.getOWLDataFactory().getOWLUntypedConstant(v);
+                                OWLAnnotation annot = mngr.getOWLDataFactory().getOWLConstantAnnotation(annotURI, constant);
+                                changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLOntologyAnnotationAxiom(ont, annot)));
+                            }
+                        }
+                    }
+                }
             }
         }
         return changes;
     }
 
-    private List<OWLOntologyChange> getUpdateChanges() throws OWLException {
-        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-        String annotationValue = "";
-        for (OWLObject bookmark : bookmarks){
-            if (bookmark instanceof OWLEntity){
-                annotationValue += ((OWLEntity)bookmark).getURI() + "\n";
-            }
-        }
-        changes.addAll(clear());
-
-        if (annotationValue.length() > 0){
-            OWLConstant value = mngr.getOWLDataFactory().getOWLUntypedConstant(annotationValue);
-            OWLAnnotation annot = mngr.getOWLDataFactory().getOWLConstantAnnotation(annotURI, value);
-            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLOntologyAnnotationAxiom(ont, annot)));
-        }
-
-        return changes;
-    }
 
     private void loadAnnotations() {
         // load the bookmark from the ontology annotations
