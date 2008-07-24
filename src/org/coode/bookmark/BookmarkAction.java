@@ -40,7 +40,7 @@ import java.awt.event.ActionEvent;
  */
 public class BookmarkAction extends ProtegeOWLAction {
     public void actionPerformed(ActionEvent actionEvent) {
-        getOWLEditorKit().getOWLWorkspace().showResultsView("org.coode.bookmark.BookmarkView", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
+        getOWLEditorKit().getWorkspace().showResultsView("org.coode.bookmark.BookmarkView", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
     }
 
     public void initialise() throws Exception {

@@ -73,7 +73,7 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
             final Object val = list.getSelectedValue();
             deleteAction.setEnabled(val != null);
             if (val != null){
-                getOWLEditorKit().getOWLWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)val);
+                getOWLEditorKit().getWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)val);
             }
         }
     };

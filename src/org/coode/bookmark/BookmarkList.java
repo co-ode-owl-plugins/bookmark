@@ -3,19 +3,19 @@ package org.coode.bookmark;
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.ui.list.OWLObjectList;
 import org.protege.editor.owl.ui.table.OWLObjectDropTargetListener;
 import org.protege.editor.owl.ui.transfer.OWLObjectDropTarget;
-import org.protege.editor.owl.ui.list.OWLObjectList;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLException;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLEntity;
 
 import javax.swing.*;
-import java.awt.dnd.DropTarget;
 import java.awt.*;
+import java.awt.dnd.DropTarget;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -60,7 +60,7 @@ public class BookmarkList extends OWLObjectList implements OWLObjectDropTarget {
 
         eKit = owlEditorKit;
 
-        model = new BookmarkModel(owlEditorKit.getOWLModelManager());
+        model = new BookmarkModel(owlEditorKit.getModelManager());
         setModel(model);
 
         DropTarget dt = new DropTarget(this, new OWLObjectDropTargetListener(this));
@@ -85,7 +85,7 @@ public class BookmarkList extends OWLObjectList implements OWLObjectDropTarget {
     }
 
     public OWLModelManager getOWLModelManager() {
-        return eKit.getOWLModelManager();
+        return eKit.getModelManager();
     }
 
     public BookmarkModel getBookmarkModel() {
