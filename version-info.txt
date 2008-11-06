@@ -1,0 +1,11 @@
+Forever getting lost in large ontologies? Or, want to keep a set of classes/properties handy for a demo? Drag classes/properties into this view and they are accessable anytime to click on. They will also be saved along with your ontology annotations for future reference.
+
+
+Version info
+------------
+
+v1.1.4 (6th Nov 2008)
+- auto-update activated
+
+
+See also: http://www.co-ode.org/downloads/protege-x/plugins/#bookmarks
