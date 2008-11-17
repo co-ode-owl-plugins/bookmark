@@ -1,11 +1,16 @@
-Forever getting lost in large ontologies? Or, want to keep a set of classes/properties handy for a demo? Drag classes/properties into this view and they are accessable anytime to click on. They will also be saved along with your ontology annotations for future reference.
+<html>
+<body>
+<p>Forever getting lost in large ontologies?
+<p>Or, want to keep a set of classes/properties handy for a demo?
+<p>Drag classes/properties into this view and they are accessable anytime to click on.
+They will also be saved along with your ontology annotations for future reference.
 
+<p><a href="http://code.google.com/p/co-ode-owl-plugins/wiki/Bookmarks">Documentation</a>
 
-Version info
-------------
+<h3>Version info</h3>
 
-v1.1.4 (6th Nov 2008)
-- auto-update activated
+<h4>v1.1.4 (6th Nov 2008)</h4>
+<ul><li>auto-update activated</li></ul>
 
-
-See also: http://www.co-ode.org/downloads/protege-x/plugins/#bookmarks
+</body>
+</html>
