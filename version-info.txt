@@ -1,5 +1,6 @@
 <html>
 <body>
+<h2>Bookmarks</h2>
 <p>Forever getting lost in large ontologies?
 <p>Or, want to keep a set of classes/properties handy for a demo?
 <p>Drag classes/properties into this view and they are accessable anytime to click on.
