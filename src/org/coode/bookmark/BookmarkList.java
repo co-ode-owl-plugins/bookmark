@@ -6,9 +6,9 @@ import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.list.OWLObjectList;
 import org.protege.editor.owl.ui.table.OWLObjectDropTargetListener;
 import org.protege.editor.owl.ui.transfer.OWLObjectDropTarget;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import javax.swing.*;
 import java.awt.*;

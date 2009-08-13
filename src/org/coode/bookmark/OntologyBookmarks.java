@@ -1,7 +1,10 @@
 package org.coode.bookmark;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.owl.model.*;
+import org.protege.editor.owl.model.util.OWLDataTypeUtils;
+import org.semanticweb.owlapi.model.*;
+import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +46,7 @@ public class OntologyBookmarks {
 
     private static final String BOOKMARK_PROP = "http://www.co-ode.org/ontologies/meta.owl#bookmark";
 
-    private URI annotURI;
+    private OWLAnnotationProperty annotationProperty;
 
     private Set<OWLEntity> bookmarks = new HashSet<OWLEntity>();
 
@@ -51,17 +54,24 @@ public class OntologyBookmarks {
 
     private OWLOntology ont;
 
+    private Set<OWLDatatype> builtinDatatypes;
+
+    private Set<URI> builtinAnnotationPropertyURIs;
+
+
     public OntologyBookmarks(OWLOntologyManager mngr, OWLOntology ont) {
         this.mngr = mngr;
         this.ont = ont;
 
-        try {
-            annotURI = new URI(BOOKMARK_PROP);
-            loadAnnotations();
-        }
-        catch (URISyntaxException e) {
-            Logger.getLogger(OntologyBookmarks.class).error(e);
-        }
+        annotationProperty = mngr.getOWLDataFactory().getOWLAnnotationProperty(IRI.create(BOOKMARK_PROP));
+
+        builtinDatatypes = new OWLDataTypeUtils(mngr).getBuiltinDatatypes();
+
+        builtinAnnotationPropertyURIs = new HashSet<URI>();
+        builtinAnnotationPropertyURIs.addAll(OWLRDFVocabulary.BUILT_IN_ANNOTATION_PROPERTIES);
+        builtinAnnotationPropertyURIs.addAll(DublinCoreVocabulary.ALL_URIS);
+
+        loadAnnotations();
     }
 
     public OWLOntology getOntology(){
@@ -79,9 +89,9 @@ public class OntologyBookmarks {
     public List<OWLOntologyChange> add(OWLEntity obj) throws OWLException {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         if (bookmarks.add(obj)){
-            OWLConstant value = mngr.getOWLDataFactory().getOWLUntypedConstant(obj.getURI().toString());
-            OWLAnnotation annot = mngr.getOWLDataFactory().getOWLConstantAnnotation(annotURI, value);
-            changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLOntologyAnnotationAxiom(ont, annot)));
+            OWLLiteral value = mngr.getOWLDataFactory().getOWLStringLiteral(obj.getURI().toString());
+            OWLAnnotation annot = mngr.getOWLDataFactory().getOWLAnnotation(annotationProperty, value);
+            changes.add(new AddOntologyAnnotation(ont, annot));
         }
         changes.addAll(tidyOldStyleAnnotations());
         return changes;
@@ -90,11 +100,14 @@ public class OntologyBookmarks {
     public List<OWLOntologyChange> remove(OWLEntity obj) throws OWLException {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         if (bookmarks.remove(obj)){
-            for (OWLOntologyAnnotationAxiom axiom : ont.getAnnotations(ont)){
-                final OWLAnnotation annotation = axiom.getAnnotation();
-                if (annotation.getAnnotationURI().equals(annotURI)){
-                    if (annotation.getAnnotationValueAsConstant().getLiteral().equals(obj.getURI().toString())){
-                        changes.add(new RemoveAxiom(ont, axiom));
+            for (OWLAnnotation annotation : ont.getAnnotations()){
+                if (annotation.getProperty().equals(annotationProperty)){
+                    final OWLAnnotationValue annotationValue = annotation.getValue();
+                    if (annotationValue instanceof OWLLiteral){
+                        OWLLiteral literal = (OWLLiteral)annotationValue;
+                        if (literal.getLiteral().equals(obj.getURI().toString())){
+                            changes.add(new RemoveOntologyAnnotation(ont, annotation));
+                        }
                     }
                 }
             }
@@ -110,19 +123,20 @@ public class OntologyBookmarks {
      */
     private List<OWLOntologyChange> tidyOldStyleAnnotations() {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-        for (OWLOntologyAnnotationAxiom axiom : ont.getAnnotations(ont)){
-            final OWLAnnotation annotation = axiom.getAnnotation();
-            if (annotation.getAnnotationURI().equals(annotURI)){
-                final String value = annotation.getAnnotationValueAsConstant().getLiteral();
-                String[] values = value.split("\n");
-                if (values.length > 1){
-                    changes.add(new RemoveAxiom(ont, axiom));
-                    for (String v : values){
-                        for (OWLEntity bookmark : bookmarks){
-                            if (bookmark.getURI().toString().equals(v)){
-                                OWLConstant constant = mngr.getOWLDataFactory().getOWLUntypedConstant(v);
-                                OWLAnnotation annot = mngr.getOWLDataFactory().getOWLConstantAnnotation(annotURI, constant);
-                                changes.add(new AddAxiom(ont, mngr.getOWLDataFactory().getOWLOntologyAnnotationAxiom(ont, annot)));
+        for (OWLAnnotation annotation : ont.getAnnotations()){
+            if (annotation.getProperty().equals(annotationProperty)){
+                final OWLAnnotationValue annotationValue = annotation.getValue();
+                if (annotationValue instanceof OWLLiteral){
+                    String[] values = ((OWLLiteral)annotationValue).getLiteral().split("\n");
+                    if (values.length > 1){
+                        changes.add(new RemoveOntologyAnnotation(ont, annotation));
+                        for (String v : values){
+                            for (OWLEntity bookmark : bookmarks){
+                                if (bookmark.getURI().toString().equals(v)){
+                                    OWLLiteral literal = mngr.getOWLDataFactory().getOWLStringLiteral(v);
+                                    OWLAnnotation annot = mngr.getOWLDataFactory().getOWLAnnotation(annotationProperty, literal);
+                                    changes.add(new AddOntologyAnnotation(ont, annot));
+                                }
                             }
                         }
                     }
@@ -135,12 +149,11 @@ public class OntologyBookmarks {
 
     private void loadAnnotations() {
         // load the bookmark from the ontology annotations
-        for (OWLOntologyAnnotationAxiom axiom : ont.getAnnotations(ont)){
-            final OWLAnnotation annotation = axiom.getAnnotation();
-            if (annotation.getAnnotationURI().equals(annotURI)){
-                OWLObject content = annotation.getAnnotationValue();
-                if (content instanceof OWLUntypedConstant){
-                    parseAnnotation(((OWLUntypedConstant)content).getLiteral());
+        for (OWLAnnotation annotation : ont.getAnnotations()){
+            if (annotation.getProperty().equals(annotationProperty)){
+                OWLAnnotationValue content = annotation.getValue();
+                if (content instanceof OWLLiteral){
+                    parseAnnotation(((OWLLiteral)content).getLiteral());
                 }
             }
         }
@@ -162,7 +175,7 @@ public class OntologyBookmarks {
     }
 
     private OWLEntity getEntityFromURI(URI uri) {
-        for (OWLOntology ont : mngr.getOntologies()){
+        for (OWLOntology ont : getOntologies()){
             if (ont.containsClassReference(uri)){
                 return mngr.getOWLDataFactory().getOWLClass(uri);
             }
@@ -176,10 +189,24 @@ public class OntologyBookmarks {
             }
 
             if (ont.containsIndividualReference(uri)){
-                return mngr.getOWLDataFactory().getOWLIndividual(uri);
+                return mngr.getOWLDataFactory().getOWLNamedIndividual(uri);
+            }
+
+            if (builtinAnnotationPropertyURIs.contains(uri) || ont.containsAnnotationPropertyReference(uri)){
+                return mngr.getOWLDataFactory().getOWLAnnotationProperty(uri);
+            }
+
+            // check datatypes including standard ones that are not currently used
+            OWLDatatype dt = mngr.getOWLDataFactory().getOWLDatatype(uri);
+            if (builtinDatatypes.contains(dt) || ont.containsDatatypeReference(uri)) {
+                return dt;
             }
         }
 
         return null;
+    }
+
+    private Set<OWLOntology> getOntologies() {
+        return mngr.getOntologies(); // should be active ontologies
     }
 }

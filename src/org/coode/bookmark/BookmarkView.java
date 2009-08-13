@@ -4,9 +4,9 @@ import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -68,6 +68,7 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
         }
     };
 
+    
     private ListSelectionListener listSelectionListener = new ListSelectionListener() {
         public void valueChanged(ListSelectionEvent e) {
             final Object val = list.getSelectedValue();
@@ -77,6 +78,7 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
             }
         }
     };
+
 
     public void initialiseView() throws Exception {
         setLayout(new BorderLayout());
@@ -92,10 +94,12 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
         addAction(deleteAction, "A", "A");
     }
 
+
     public void disposeView() {
         list.getSelectionModel().removeListSelectionListener(listSelectionListener);
         list.getBookmarkModel().dispose();
     }
+
 
     protected OWLObject updateView() {
         OWLEntity selectedEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
@@ -127,6 +131,16 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
 
 
     protected boolean isOWLIndividualView() {
+        return true;
+    }
+
+
+    protected boolean isOWLAnnotationPropertyView() {
+        return true;
+    }
+
+
+    protected boolean isOWLDatatypeView() {
         return true;
     }
 }

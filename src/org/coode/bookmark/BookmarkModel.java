@@ -5,8 +5,7 @@ import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.ui.OWLEntityComparator;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -133,7 +132,7 @@ public class BookmarkModel implements ListModel {
             valueSet.addAll(bms.getBookmarks());
         }
         List<OWLEntity> valueList = new ArrayList<OWLEntity>(valueSet);
-        Collections.sort(valueList, new OWLEntityComparator<OWLEntity>(mngr));
+        Collections.sort(valueList);
         return valueList.get(i);
     }
 
@@ -154,7 +153,7 @@ public class BookmarkModel implements ListModel {
 
     private void refill() throws OWLException {
         ontologybookmarks.clear();
-        for (OWLOntology ont : mngr.getOntologies()){
+        for (OWLOntology ont : mngr.getActiveOntologies()){
             OntologyBookmarks bms = new OntologyBookmarks(mngr.getOWLOntologyManager(), ont);
             ontologybookmarks.put(ont, bms);
         }
