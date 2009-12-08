@@ -56,7 +56,7 @@ public class OntologyBookmarks {
 
     private Set<OWLDatatype> builtinDatatypes;
 
-    private Set<URI> builtinAnnotationPropertyURIs;
+    private Set<IRI> builtinAnnotationPropertyIRIs;
 
 
     public OntologyBookmarks(OWLOntologyManager mngr, OWLOntology ont) {
@@ -67,9 +67,11 @@ public class OntologyBookmarks {
 
         builtinDatatypes = new OWLDataTypeUtils(mngr).getBuiltinDatatypes();
 
-        builtinAnnotationPropertyURIs = new HashSet<URI>();
-        builtinAnnotationPropertyURIs.addAll(OWLRDFVocabulary.BUILT_IN_ANNOTATION_PROPERTIES);
-        builtinAnnotationPropertyURIs.addAll(DublinCoreVocabulary.ALL_URIS);
+        builtinAnnotationPropertyIRIs = new HashSet<IRI>();
+        builtinAnnotationPropertyIRIs.addAll(OWLRDFVocabulary.BUILT_IN_ANNOTATION_PROPERTY_IRIS);
+        for (URI uri : DublinCoreVocabulary.ALL_URIS){
+            builtinAnnotationPropertyIRIs.add(IRI.create(uri));
+        }
 
         loadAnnotations();
     }
@@ -89,7 +91,7 @@ public class OntologyBookmarks {
     public List<OWLOntologyChange> add(OWLEntity obj) throws OWLException {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         if (bookmarks.add(obj)){
-            OWLLiteral value = mngr.getOWLDataFactory().getOWLStringLiteral(obj.getURI().toString());
+            OWLLiteral value = mngr.getOWLDataFactory().getOWLStringLiteral(obj.getIRI().toString());
             OWLAnnotation annot = mngr.getOWLDataFactory().getOWLAnnotation(annotationProperty, value);
             changes.add(new AddOntologyAnnotation(ont, annot));
         }
@@ -105,7 +107,7 @@ public class OntologyBookmarks {
                     final OWLAnnotationValue annotationValue = annotation.getValue();
                     if (annotationValue instanceof OWLLiteral){
                         OWLLiteral literal = (OWLLiteral)annotationValue;
-                        if (literal.getLiteral().equals(obj.getURI().toString())){
+                        if (literal.getLiteral().equals(obj.getIRI().toString())){
                             changes.add(new RemoveOntologyAnnotation(ont, annotation));
                         }
                     }
@@ -192,7 +194,7 @@ public class OntologyBookmarks {
                 return mngr.getOWLDataFactory().getOWLNamedIndividual(iri);
             }
 
-            if (builtinAnnotationPropertyURIs.contains(iri.toURI()) || ont.containsAnnotationPropertyReference(iri)){
+            if (builtinAnnotationPropertyIRIs.contains(iri) || ont.containsAnnotationPropertyReference(iri)){
                 return mngr.getOWLDataFactory().getOWLAnnotationProperty(iri);
             }
 
