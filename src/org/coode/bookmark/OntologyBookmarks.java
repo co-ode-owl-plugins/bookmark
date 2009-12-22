@@ -134,7 +134,7 @@ public class OntologyBookmarks {
                         changes.add(new RemoveOntologyAnnotation(ont, annotation));
                         for (String v : values){
                             for (OWLEntity bookmark : bookmarks){
-                                if (bookmark.getURI().toString().equals(v)){
+                                if (bookmark.getIRI().toString().equals(v)){
                                     OWLLiteral literal = mngr.getOWLDataFactory().getOWLStringLiteral(v);
                                     OWLAnnotation annot = mngr.getOWLDataFactory().getOWLAnnotation(annotationProperty, literal);
                                     changes.add(new AddOntologyAnnotation(ont, annot));
