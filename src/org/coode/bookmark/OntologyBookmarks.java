@@ -178,29 +178,29 @@ public class OntologyBookmarks {
 
     private OWLEntity getEntityFromIRI(IRI iri) {
         for (OWLOntology ont : getOntologies()){
-            if (ont.containsClassReference(iri)){
+            if (ont.containsClassInSignature(iri)){
                 return mngr.getOWLDataFactory().getOWLClass(iri);
             }
 
-            if (ont.containsObjectPropertyReference(iri)){
+            if (ont.containsObjectPropertyInSignature(iri)){
                 return mngr.getOWLDataFactory().getOWLObjectProperty(iri);
             }
 
-            if (ont.containsDataPropertyReference(iri)){
+            if (ont.containsDataPropertyInSignature(iri)){
                 return mngr.getOWLDataFactory().getOWLDataProperty(iri);
             }
 
-            if (ont.containsIndividualReference(iri)){
+            if (ont.containsIndividualInSignature(iri)){
                 return mngr.getOWLDataFactory().getOWLNamedIndividual(iri);
             }
 
-            if (builtinAnnotationPropertyIRIs.contains(iri) || ont.containsAnnotationPropertyReference(iri)){
+            if (builtinAnnotationPropertyIRIs.contains(iri) || ont.containsAnnotationPropertyInSignature(iri)){
                 return mngr.getOWLDataFactory().getOWLAnnotationProperty(iri);
             }
 
             // check datatypes including standard ones that are not currently used
             OWLDatatype dt = mngr.getOWLDataFactory().getOWLDatatype(iri);
-            if (builtinDatatypes.contains(dt) || ont.containsDatatypeReference(iri)) {
+            if (builtinDatatypes.contains(dt) || ont.containsDatatypeInSignature(iri)) {
                 return dt;
             }
         }
