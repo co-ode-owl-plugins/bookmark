@@ -47,11 +47,14 @@ import java.awt.event.ActionEvent;
  * <p/>
  */
 public class BookmarkView extends AbstractOWLSelectionViewComponent {
+	private static final long serialVersionUID = -8559594691278332112L;
 
-    private BookmarkList list;
+	private BookmarkList list;
 
     private DisposableAction deleteAction = new DisposableAction("Remove Bookmark", OWLIcons.getIcon("class.delete.png")){
-        public void dispose() {
+		private static final long serialVersionUID = 1L;
+
+		public void dispose() {
         }
 
         public void actionPerformed(ActionEvent actionEvent) {
