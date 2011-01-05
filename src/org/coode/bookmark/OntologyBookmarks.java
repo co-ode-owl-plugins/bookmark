@@ -69,8 +69,8 @@ public class OntologyBookmarks {
 
         builtinAnnotationPropertyIRIs = new HashSet<IRI>();
         builtinAnnotationPropertyIRIs.addAll(OWLRDFVocabulary.BUILT_IN_ANNOTATION_PROPERTY_IRIS);
-        for (URI uri : DublinCoreVocabulary.ALL_URIS){
-            builtinAnnotationPropertyIRIs.add(IRI.create(uri));
+        for (IRI uri : DublinCoreVocabulary.ALL_URIS){
+            builtinAnnotationPropertyIRIs.add(uri);
         }
 
         loadAnnotations();
