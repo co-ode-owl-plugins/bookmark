@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pluginUpdateInfo version="1.2.2" id="org.coode.bookmark" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://protege.googlecode.com/svn/trunk/autoupdate/4_1/PluginUpdateInfo.xsd">
+
+	<name>Bookmark View</name>
+
+	<author>CO-ODE, The University of Manchester</author>
+
+	<license>http://www.gnu.org/licenses/lgpl.html</license>
+	
+	<readme>http://co-ode-owl-plugins.googlecode.com/svn/trunk/bookmark/etc/version.bookmark.html</readme>
+
+	<download>http://co-ode-owl-plugins.googlecode.com/files/org.coode.bookmark_1_2_2.zip</download>
+	
+	<categories>
+		<category>Navigation</category>
+	</categories>
+	
+	<dependencies />
+
+</pluginUpdateInfo>
