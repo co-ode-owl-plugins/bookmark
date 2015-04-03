@@ -1,9 +1,9 @@
 package org.coode.bookmark;
 
-import org.protege.editor.owl.model.OWLWorkspace;
-import org.protege.editor.owl.ui.action.ProtegeOWLAction;
-
 import java.awt.event.ActionEvent;
+
+import org.protege.editor.core.ui.workspace.Workspace;
+import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -39,11 +39,13 @@ import java.awt.event.ActionEvent;
  * <p/>
  */
 public class BookmarkAction extends ProtegeOWLAction {
+    private static final long serialVersionUID = 1L;
+
     public void actionPerformed(ActionEvent actionEvent) {
-        getOWLEditorKit().getWorkspace().showResultsView("org.coode.bookmark.BookmarkView", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
+        getOWLEditorKit().getWorkspace().showResultsView("org.coode.bookmark.BookmarkView", true, Workspace.BOTTOM_RESULTS_VIEW);
     }
 
-    public void initialise() throws Exception {
+    public void initialise() {
     }
 
     public void dispose() {

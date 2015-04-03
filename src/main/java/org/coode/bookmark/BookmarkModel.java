@@ -1,16 +1,27 @@
 package org.coode.bookmark;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.ListModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import java.util.*;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -44,7 +55,7 @@ import java.util.*;
  * Date: Oct 5, 2006<br><br>
  * <p/>
  */
-public class BookmarkModel implements ListModel {
+public class BookmarkModel implements ListModel<OWLEntity> {
 
     private Map<OWLOntology, OntologyBookmarks> ontologybookmarks = new HashMap<OWLOntology, OntologyBookmarks>();
 
@@ -53,7 +64,7 @@ public class BookmarkModel implements ListModel {
     private List<ListDataListener> listeners = new ArrayList<ListDataListener>();
 
     private OWLOntologyChangeListener ontListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
+        public void ontologiesChanged(List<? extends OWLOntologyChange> changes) {
             refill();
         }
     };
@@ -64,14 +75,14 @@ public class BookmarkModel implements ListModel {
                 try {
                     refill();
                 }
-                catch (OWLException e) {
+                catch (OWLRuntimeException e) {
                     Logger.getLogger(BookmarkModel.class).error(e);
                 }
             }
         }
     };
 
-    public BookmarkModel(OWLModelManager owlModelManager) {
+    protected BookmarkModel(OWLModelManager owlModelManager) {
         super();
 
         mngr = owlModelManager;
@@ -83,17 +94,16 @@ public class BookmarkModel implements ListModel {
         try {
             refill();
         }
-        catch (OWLException e) {
+        catch (OWLRuntimeException e) {
             Logger.getLogger(BookmarkModel.class).error(e);
         }
     }
 
     /**
      * Always add to the active ontology bookmark
-     * @param obj
-     * @throws OWLException
+     * @param obj object to add
      */
-    public void add(OWLEntity obj) throws OWLException {
+    public void add(OWLEntity obj) {
         OWLOntology ont = mngr.getActiveOntology();
         List<OWLOntologyChange> changes = ontologybookmarks.get(ont).add(obj);
         if (!changes.isEmpty()){
@@ -104,10 +114,9 @@ public class BookmarkModel implements ListModel {
 
     /**
      * Always remove from all ontologies' bookmark
-     * @param obj
-     * @throws OWLException
+     * @param obj object to remove
      */
-    public void remove(OWLEntity obj) throws OWLException {
+    public void remove(OWLEntity obj) {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         for (OntologyBookmarks bm : ontologybookmarks.values()){
             changes.addAll(bm.remove(obj));
@@ -151,7 +160,7 @@ public class BookmarkModel implements ListModel {
     }
 
 
-    private void refill() throws OWLException {
+    protected void refill() {
         ontologybookmarks.clear();
         for (OWLOntology ont : mngr.getActiveOntologies()){
             OntologyBookmarks bms = new OntologyBookmarks(mngr.getOWLOntologyManager(), ont);
@@ -160,12 +169,15 @@ public class BookmarkModel implements ListModel {
         fireDataChanged();
     }
 
-    private void refill(OWLOntology ont) throws OWLException {
+    private void refill(OWLOntology ont) {
         ontologybookmarks.remove(ont);
         ontologybookmarks.put(ont, new OntologyBookmarks(mngr.getOWLOntologyManager(), ont));
         fireDataChanged();
     }
 
+    /**
+     * Dispose the object: remove listeners.
+     */
     public void dispose(){
         listeners.clear();
         mngr.removeListener(modelListener);
@@ -173,6 +185,10 @@ public class BookmarkModel implements ListModel {
     }
 
 
+    /**
+     * @param entity entity to check
+     * @return true if the entity is contained in the bookmarks
+     */
     public boolean contains(OWLEntity entity) {
         for (OntologyBookmarks bm : ontologybookmarks.values()){
             if (bm.getBookmarks().contains(entity)){

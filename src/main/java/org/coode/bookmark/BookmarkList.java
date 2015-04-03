@@ -1,5 +1,13 @@
 package org.coode.bookmark;
 
+import java.awt.Point;
+import java.awt.dnd.DropTarget;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.JComponent;
+
 import org.apache.log4j.Logger;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -7,15 +15,8 @@ import org.protege.editor.owl.ui.list.OWLObjectList;
 import org.protege.editor.owl.ui.table.OWLObjectDropTargetListener;
 import org.protege.editor.owl.ui.transfer.OWLObjectDropTarget;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLObject;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.dnd.DropTarget;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -50,11 +51,15 @@ import java.util.Set;
  * Date: Oct 5, 2006<br><br>
  * <p/>
  */
-public class BookmarkList extends OWLObjectList implements OWLObjectDropTarget {
+public class BookmarkList extends OWLObjectList<OWLEntity> implements OWLObjectDropTarget {
+    private static final long serialVersionUID = 1L;
 
     private final OWLEditorKit eKit;
     private final BookmarkModel model;
 
+    /**
+     * @param owlEditorKit editor kit for the component
+     */
     public BookmarkList(OWLEditorKit owlEditorKit) {
         super(owlEditorKit);
 
@@ -63,7 +68,9 @@ public class BookmarkList extends OWLObjectList implements OWLObjectDropTarget {
         model = new BookmarkModel(owlEditorKit.getModelManager());
         setModel(model);
 
-        DropTarget dt = new DropTarget(this, new OWLObjectDropTargetListener(this));
+        // Variable is unised but calling the constructor is necessary to register the target listener
+        @SuppressWarnings("unused")
+        DropTarget dropTarget = new DropTarget(this, new OWLObjectDropTargetListener(this));
     }
 
     public JComponent getComponent() {
@@ -77,7 +84,7 @@ public class BookmarkList extends OWLObjectList implements OWLObjectDropTarget {
                     model.add((OWLEntity)obj);
                 }
             }
-            catch (OWLException e) {
+            catch (OWLRuntimeException e) {
                 Logger.getLogger(BookmarkList.class).error(e);
             }
         }
@@ -88,14 +95,20 @@ public class BookmarkList extends OWLObjectList implements OWLObjectDropTarget {
         return eKit.getModelManager();
     }
 
+    /**
+     * @return bookmark model
+     */
     public BookmarkModel getBookmarkModel() {
         return model;
     }
 
+    /**
+     * @return currently selected objects
+     */
     public Set<OWLEntity> getSelectedObjects() {
         Set<OWLEntity> objs = new HashSet<OWLEntity>();
         for (int row : getSelectedIndices()){
-            objs.add((OWLEntity)getModel().getElementAt(row));
+            objs.add(getModel().getElementAt(row));
         }
         return objs;
     }

@@ -1,18 +1,19 @@
 package org.coode.bookmark;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLObject;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -49,12 +50,13 @@ import java.awt.event.ActionEvent;
 public class BookmarkView extends AbstractOWLSelectionViewComponent {
 	private static final long serialVersionUID = -8559594691278332112L;
 
-	private BookmarkList list;
+	protected BookmarkList list;
 
-    private DisposableAction deleteAction = new DisposableAction("Remove Bookmark", OWLIcons.getIcon("class.delete.png")){
+    protected DisposableAction deleteAction = new DisposableAction("Remove Bookmark", OWLIcons.getIcon("class.delete.png")){
 		private static final long serialVersionUID = 1L;
 
-		public void dispose() {
+		@Override
+        public void dispose() {
         }
 
         public void actionPerformed(ActionEvent actionEvent) {
@@ -64,7 +66,7 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
                         list.getBookmarkModel().remove((OWLEntity)obj);
                     }
                 }
-                catch (OWLException e) {
+                catch (OWLRuntimeException e) {
                     Logger.getLogger(BookmarkView.class).error(e);
                 }
             }
@@ -83,7 +85,8 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
     };
 
 
-    public void initialiseView() throws Exception {
+    @Override
+    public void initialiseView() {
         setLayout(new BorderLayout());
 
         list = new BookmarkList(getOWLEditorKit());
@@ -98,12 +101,14 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
     }
 
 
+    @Override
     public void disposeView() {
         list.getSelectionModel().removeListSelectionListener(listSelectionListener);
         list.getBookmarkModel().dispose();
     }
 
 
+    @Override
     protected OWLObject updateView() {
         OWLEntity selectedEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
         if (list.getSelectedObjects().contains(selectedEntity)){
@@ -118,31 +123,37 @@ public class BookmarkView extends AbstractOWLSelectionViewComponent {
     }
 
 
+    @Override
     protected boolean isOWLClassView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLObjectPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLDataPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLIndividualView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLAnnotationPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLDatatypeView() {
         return true;
     }

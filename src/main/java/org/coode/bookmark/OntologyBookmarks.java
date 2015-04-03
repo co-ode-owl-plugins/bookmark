@@ -17,7 +17,6 @@ import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
@@ -76,6 +75,10 @@ public class OntologyBookmarks {
     private Set<IRI> builtinAnnotationPropertyIRIs;
 
 
+    /**
+     * @param mngr manager
+     * @param ont ontology
+     */
     public OntologyBookmarks(OWLOntologyManager mngr, OWLOntology ont) {
         this.mngr = mngr;
         this.ont = ont;
@@ -93,19 +96,32 @@ public class OntologyBookmarks {
         loadAnnotations();
     }
 
+    /**
+     * @return the ontology
+     */
     public OWLOntology getOntology(){
         return ont;
     }
 
+    /**
+     * @return a copy of the bookmarks
+     */
     public Set<OWLEntity> getBookmarks(){
         return Collections.unmodifiableSet(bookmarks);
     }
 
+    /**
+     * @return number of bookmarks
+     */
     public int getSize() {
         return bookmarks.size();
     }
 
-    public List<OWLOntologyChange> add(OWLEntity obj) throws OWLException {
+    /**
+     * @param obj object to add
+     * @return changes to apply
+     */
+    public List<OWLOntologyChange> add(OWLEntity obj) {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         if (bookmarks.add(obj)){
             OWLLiteral value = mngr.getOWLDataFactory().getOWLLiteral(
@@ -117,7 +133,11 @@ public class OntologyBookmarks {
         return changes;
     }
 
-    public List<OWLOntologyChange> remove(OWLEntity obj) throws OWLException {
+    /**
+     * @param obj object to remove
+     * @return changes to apply
+     */
+    public List<OWLOntologyChange> remove(OWLEntity obj) {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         if (bookmarks.remove(obj)){
             for (OWLAnnotation annotation : ont.getAnnotations()){
@@ -197,25 +217,25 @@ public class OntologyBookmarks {
     }
 
     private OWLEntity getEntityFromIRI(IRI iri) {
-        for (OWLOntology ont : getOntologies()){
-            if (ont.containsClassInSignature(iri, Imports.EXCLUDED)) {
+        for (OWLOntology ontology : getOntologies()){
+            if (ontology.containsClassInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLClass(iri);
             }
 
-            if (ont.containsObjectPropertyInSignature(iri, Imports.EXCLUDED)) {
+            if (ontology.containsObjectPropertyInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLObjectProperty(iri);
             }
 
-            if (ont.containsDataPropertyInSignature(iri, Imports.EXCLUDED)) {
+            if (ontology.containsDataPropertyInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLDataProperty(iri);
             }
 
-            if (ont.containsIndividualInSignature(iri, Imports.EXCLUDED)) {
+            if (ontology.containsIndividualInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLNamedIndividual(iri);
             }
 
             if (builtinAnnotationPropertyIRIs.contains(iri)
-                    || ont.containsAnnotationPropertyInSignature(iri,
+                    || ontology.containsAnnotationPropertyInSignature(iri,
                             Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLAnnotationProperty(iri);
             }
@@ -223,7 +243,7 @@ public class OntologyBookmarks {
             // check datatypes including standard ones that are not currently used
             OWLDatatype dt = mngr.getOWLDataFactory().getOWLDatatype(iri);
             if (builtinDatatypes.contains(dt)
-                    || ont.containsDatatypeInSignature(iri, Imports.EXCLUDED)) {
+                    || ontology.containsDatatypeInSignature(iri, Imports.EXCLUDED)) {
                 return dt;
             }
         }
