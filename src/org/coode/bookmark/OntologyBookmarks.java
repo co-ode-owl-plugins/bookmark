@@ -1,14 +1,31 @@
 package org.coode.bookmark;
 
-import org.apache.log4j.Logger;
-import org.protege.editor.owl.model.util.OWLDataTypeUtils;
-import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
-
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.protege.editor.owl.model.util.OWLDataTypeUtils;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
+import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.vocab.DublinCoreVocabulary;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -91,7 +108,8 @@ public class OntologyBookmarks {
     public List<OWLOntologyChange> add(OWLEntity obj) throws OWLException {
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
         if (bookmarks.add(obj)){
-            OWLLiteral value = mngr.getOWLDataFactory().getOWLStringLiteral(obj.getIRI().toString());
+            OWLLiteral value = mngr.getOWLDataFactory().getOWLLiteral(
+                    obj.getIRI().toString());
             OWLAnnotation annot = mngr.getOWLDataFactory().getOWLAnnotation(annotationProperty, value);
             changes.add(new AddOntologyAnnotation(ont, annot));
         }
@@ -135,7 +153,9 @@ public class OntologyBookmarks {
                         for (String v : values){
                             for (OWLEntity bookmark : bookmarks){
                                 if (bookmark.getIRI().toString().equals(v)){
-                                    OWLLiteral literal = mngr.getOWLDataFactory().getOWLStringLiteral(v);
+                                    OWLLiteral literal = mngr
+                                            .getOWLDataFactory().getOWLLiteral(
+                                                    v);
                                     OWLAnnotation annot = mngr.getOWLDataFactory().getOWLAnnotation(annotationProperty, literal);
                                     changes.add(new AddOntologyAnnotation(ont, annot));
                                 }
@@ -178,29 +198,32 @@ public class OntologyBookmarks {
 
     private OWLEntity getEntityFromIRI(IRI iri) {
         for (OWLOntology ont : getOntologies()){
-            if (ont.containsClassInSignature(iri)){
+            if (ont.containsClassInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLClass(iri);
             }
 
-            if (ont.containsObjectPropertyInSignature(iri)){
+            if (ont.containsObjectPropertyInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLObjectProperty(iri);
             }
 
-            if (ont.containsDataPropertyInSignature(iri)){
+            if (ont.containsDataPropertyInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLDataProperty(iri);
             }
 
-            if (ont.containsIndividualInSignature(iri)){
+            if (ont.containsIndividualInSignature(iri, Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLNamedIndividual(iri);
             }
 
-            if (builtinAnnotationPropertyIRIs.contains(iri) || ont.containsAnnotationPropertyInSignature(iri)){
+            if (builtinAnnotationPropertyIRIs.contains(iri)
+                    || ont.containsAnnotationPropertyInSignature(iri,
+                            Imports.EXCLUDED)) {
                 return mngr.getOWLDataFactory().getOWLAnnotationProperty(iri);
             }
 
             // check datatypes including standard ones that are not currently used
             OWLDatatype dt = mngr.getOWLDataFactory().getOWLDatatype(iri);
-            if (builtinDatatypes.contains(dt) || ont.containsDatatypeInSignature(iri)) {
+            if (builtinDatatypes.contains(dt)
+                    || ont.containsDatatypeInSignature(iri, Imports.EXCLUDED)) {
                 return dt;
             }
         }
